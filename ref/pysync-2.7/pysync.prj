@@ -1,0 +1,121 @@
+;; -*- Prcs -*-
+(Created-By-Prcs-Version 1 3 1)
+(Project-Description "A Python implementation of the rsync algorithm")
+(Project-Version pysync 2 7)
+(Parent-Version pysync 2 6)
+(Version-Log "Updated README to include correct reference to librsync patch needed.")
+(New-Version-Log "")
+(Checkin-Time "Fri, 03 May 2002 00:42:25 +1000")
+(Checkin-Login abo)
+(Populate-Ignore (
+    "~$"
+    "\\.pyc$"
+    "\\.o$"
+    "\\.so$"
+    "\\.obj$"
+    "\\.exe$"
+    "\\.bin$"
+    "^build/"
+    "^dist/"
+    "^arc$"
+    "^swf/"
+    "^tmp/"
+    "^librsync/"
+    "_wrap\\.\\(c\\|doc\\)$"
+    "MANIFEST$"
+))
+(Project-Keywords 
+    (ProjectAuthorName "Donovan Baarda")
+    (ProjectAuthorEmail "abo@minkirri.apana.org.au")
+    (ProjectUrl "http://freshmeat.net/projects/pysync/")
+    (ProjectDescription "A Python implementation of the rsync algorithm")
+)
+(Files
+;; This is a comment.  Fill in files here.
+;; For example:  (prcs/checkout.cc ())
+
+;; Files added by populate at Thu, 07 Dec 2000 22:40:13 +1100,
+;; to version 0.0(w), by abo:
+
+  (adler32.py (pysync/0_adler32.py 1.7 664))
+  (test/zlibtest.py (pysync/1_zlibtest.p 1.2 775))
+  (pysync.py (pysync/2_pysync.py 1.17 775))
+
+;; Files added by populate at Sat, 09 Dec 2000 00:05:22 +1100,
+;; to version 0.4(w), by abo:
+
+  
+
+;; Files added by populate at Sun, 28 Jan 2001 00:15:50 +1100,
+;; to version 0.8(w), by abo:
+
+  
+  (README (pysync/5_README 1.7 664))
+
+;; Files added by populate at Thu, 01 Mar 2001 21:38:40 +1100,
+;; to version 0.9(w), by abo:
+
+  (test/pysyncT1.py (pysync/6_pysync-tes 1.5 775))
+
+;; Files added by populate at Sat, 27 Apr 2002 16:06:31 +1000,
+;; to version 1.9(w), by abo:
+
+  (librsync.i (pysync/7_librsync.i 1.6 664))
+  (adler32c.pyx (pysync/8_adler32c.p 1.1 664))
+  (setup.py (pysync/9_setup.py 1.3 664))
+  (md4sum/md4c.c (pysync/10_md4c.c 1.1 644))
+  (md4sum/md4.h (pysync/11_md4.h 1.2 644))
+  (md4sum/md4module.c (pysync/12_md4module. 1.1 644))
+  (Makefile (pysync/13_Makefile 1.17 644))
+
+;; Files deleted by populate at Sat, 27 Apr 2002 16:06:31 +1000,
+;; from version 1.9(w), by abo:
+
+  ; (zlib-bug.c ())
+
+;; Files added by populate at Tue, 30 Apr 2002 00:27:41 +1000,
+;; to version 1.12(w), by abo:
+
+  (test/librsyncT1.py (pysync/14_librsync-t 1.4 775))
+
+;; Files deleted by depopulate at Tue, 30 Apr 2002 00:27:58 +1000,
+;; from version 1.12(w), by abo:
+
+  ; (zlib-bug.py ())
+
+;; Files added by populate at Tue, 30 Apr 2002 23:25:56 +1000,
+;; to version 1.13(w), by abo:
+
+  (rollsum/rollsum.h (pysync/15_rollsum.h 1.3 644))
+  (rollsum/rollsum.c (pysync/16_rollsum.c 1.3 644))
+  (test/librsyncT2.py (pysync/17_librsyncT2 1.3 775))
+
+;; Files added by populate at Wed, 01 May 2002 10:37:53 +1000,
+;; to version 1.14(w), by abo:
+
+  (rollsum/rollsum.i (pysync/18_rollsum.i 1.1 644))
+  (rollsum/rollsumT1.py (pysync/19_rollsumT1. 1.2 775))
+  (rollsum/rollsummodule.c (pysync/20_rollsummod 1.1 644))
+
+;; Files added by populate at Wed, 01 May 2002 12:12:29 +1000,
+;; to version 1.15(w), by abo:
+
+  (rollsum/Makefile (pysync/21_Makefile 1.1 644))
+
+;; Files added by populate at Wed, 01 May 2002 15:50:28 +1000,
+;; to version 1.18(w), by abo:
+
+  (MANIFEST.in (pysync/22_MANIFEST.i 1.5 664))
+
+;; Files added by populate at Thu, 02 May 2002 15:24:41 +1000,
+;; to version 1.26(w), by abo:
+
+  (librsync.py.inc (pysync/23_librsync.p 1.2 664))
+
+;; Files added by populate at Thu, 02 May 2002 23:19:25 +1000,
+;; to version 2.3(w), by abo:
+
+  (test/testdata.py (pysync/24_testdata.p 1.1 775))
+)
+(Merge-Parents)
+(New-Merge-Parents)

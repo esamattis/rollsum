@@ -1,0 +1,8 @@
+include Makefile
+include librsync.i librsync.py.inc librsync_wrap.*
+include librsync/COPYING librsync/*.h
+include librsync/configure librsync/Makefile.in librsync/config.h.in
+include librsync/config.guess librsync/config.sub librsync/install-sh 
+include librsync/popt/Makefile.in
+include md4sum/*.h
+include test/*.py

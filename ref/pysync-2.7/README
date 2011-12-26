@@ -1,0 +1,113 @@
+Pysync
+------
+
+Pysync is a demonstration implementation of the rsync algorithm in Python.
+It is not fast and is not optimized, however it does work and is very
+simple. The primary aim is to provide a simple implementation of the
+algorithm for reference and experimentation, thus code clarity has been
+given a higher priority than performance. It includes a combination of ideas
+taken from librsync, xdelta, and rsync. 
+
+It now also includes an md4 extension module, and a librsync extension
+module built using swig. The librsync extension module is a very fast
+alternative for use in real world applications. The original pure Python
+pysync module is best for demonstrating and experimenting with the
+algorithm.
+
+Both 'pysync.py' and 'librsync.py' are their own best documentation. Both
+can be executed with Python as general purpose file signature/delta/patch
+utilities similar to the rdiff utility that comes with librsync.
+
+Note that the librsync and pysync delta and signature files are not
+compatible. The librsync signature and delta files are compatible with the
+librsync rdiff utility.
+
+
+INSTALLATION
+------------
+
+Pysync is available as binary and source packages for both Windows and
+Linux. The binary packages and windows source package have been build using
+pythons distutils. The windows source archive includes everything needed to
+build on windows using distutils and MSVC. The unix source package does not
+include librsync, but includes everything required to build pysync from
+scratch using swig, distutils, make etc.
+
+Windows Binary: Get and run the pysync Windows installer.
+
+Linux Binary: Get and install the pysync Linux rpm. Debian users can use
+'alien' to convert it to a deb.
+
+Windows Source: Get and extract the pysync .zip source archive. In the
+directory where you extracted pysync, run "python setup.py bdist_wininst".
+This will compile and create a Windows installer in the "dist" directory.
+
+Unix Source: Get and extract the pysync .tar.bz2 source archive. Get and
+extract the librsync source into a directory 'librsync' off the pysync
+directory. For version 0.9.5 of librsync (the latest at this release), you
+should get and apply the "MSVC6 and Cygwin compiling" patch from
+Sourceforge, as this includes some important bug fixes. In the pysync
+directory run "make". This will configure librsync, run swig to generate the
+librsync wrapper, and compile and generate dumb source and binary packages
+in the "dist" directory. Check the Makefile for other build and clean
+options.
+
+
+pysync module
+-------------
+
+The pysync module includes low level, high level, and file level API's. The
+source of pysync.py includes extensive documentation that explains it very
+clearly. The test code included is a good example of how it can be used.
+
+
+librsync module
+---------------
+
+The librsync module is a swig wrapper around the librsync library. This
+wrapper includes both low level and file level API's. The swig generated
+documentation "librsync_wrap.doc" summarises the available classes and
+methods. The swig generated shadow class librsync.py includes test code that
+is a good example of how the file level API works.
+
+The file level API allows signature, delta and patch operations on Python
+Files. This API is identical to the file level API of pysync. It should work
+on any Python File type object that can be converted to a real file handle,
+including things like sockets.
+
+Unfortunately the low level incremental API does not yet work. Anyone with
+more experience getting swig callbacks to work are welcome to help fix this.
+The incremental delta and patch operation is broken, but the signature
+generation and loading appears to work.
+
+
+md4sum module
+-------------
+
+The md4sum directory contains a md4 extension module. This module was
+created simply by getting the files md4c.c and md4.h from libmd-0.3
+<http://www.penguin.cz/~mhi/libmd/>, and generating md4module.c by running;
+
+sed 's/\(md\)5/\14/i' <md5module.c >md4module.c
+
+This works because the RSA md5 code used by Python has an identical API to
+the RSA md4 code. The md4.h header was also fixed slightly for windows
+compiling.
+
+
+CONTACTS
+--------
+
+The librsync library is hosted on sourceforge as part of the rproxy project
+<https://sourceforge.net/projects/rproxy/>.
+
+The librsync swig wrapper development was kindly sponsored by Accellion
+<http://www.accellion.com/>.
+
+Pysync is mantained by Donovan Baarda <abo@minkirri.apana.org.au>. The
+freshmeat appindex entry serves as the project's homepage. Please email any
+comments/suggestions/complaints to me, or leave a comment on the freshmeat
+appindex entry <http://freshmeat.net/projects/pysync/>.
+
+Donovan Baarda <abo@minkirri.apana.org.au>
+http://sourceforge.net/users/abo/
