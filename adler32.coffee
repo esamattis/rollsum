@@ -89,8 +89,9 @@ class Adler32 extends EventEmitter
   constructor: (@windowSize, @needleArray) ->
     @calc = new Uint32Array 3
     @calc[0] = 0
-    # @calc[0] = 1
-    @calc[1] = 0
+
+    # @calc[1] = 1
+    @calc[1] = 0 # Fast variant
 
 
     @count = 0
@@ -131,18 +132,20 @@ class Adler32 extends EventEmitter
 
     console.log @intTable
     # For debugging
-    @arr = []
+    # @arr = []
 
   sumOnly: (data) ->
     for byte in data
-      @calc[0] += byte + ROLLSUM_CHAR_OFFSET
-      @calc[1] += @calc[0]
+
       # @calc[0] = @calc[0] + byte
       # @calc[1] = @calc[1] + @calc[0]
       # @calc[0] %= BASE
       # @calc[1] %= BASE
+      @calc[0] += byte + ROLLSUM_CHAR_OFFSET # fast variant
+      @calc[1] += @calc[0] # fast variant
 
-    @calc[2] = (@calc[1] << 16) | @calc[0]
+    # @calc[2] = (@calc[1] << 16) | @calc[0]
+    @calc[2] = (@calc[1] << 16) | (@calc[0] & 0xffff) # fast variant
 
 
 
@@ -150,10 +153,11 @@ class Adler32 extends EventEmitter
     for byte in data
       if @pos < @windowSize
         # Just rollin and fill the window
-        @calc[0] += byte + ROLLSUM_CHAR_OFFSET
-        @calc[1] += @calc[0]
+
         # @calc[0] = @calc[0] + byte
         # @calc[1] = @calc[1] + @calc[0]
+        @calc[0] += byte + ROLLSUM_CHAR_OFFSET # fast variant
+        @calc[1] += @calc[0] # fast variant
 
         @count += 1
         @buf[@pos] = byte
@@ -168,9 +172,9 @@ class Adler32 extends EventEmitter
         # byteOut = @arr.shift()
 
         # @calc[0] += byte - byteOut
-        # @calc[1] += @calc[0] - @count * byteOut - OFFS
-        @calc[0] += byte - byteOut
-        @calc[1] += @calc[0] - @count * (byteOut + ROLLSUM_CHAR_OFFSET)
+        # @calc[1] += @calc[0] - @count * byteOut
+        @calc[0] += byte - byteOut # fast variant
+        @calc[1] += @calc[0] - @count * (byteOut + ROLLSUM_CHAR_OFFSET) # fast variant
 
 
         @buf[inPos] = byte
@@ -182,7 +186,9 @@ class Adler32 extends EventEmitter
 
       @pos += 1
 
-      @calc[2] = ((@calc[1] << 16) | @calc[0])
+      # @calc[2] = ((@calc[1] << 16) | @calc[0])
+      @calc[2] = (@calc[1] << 16) | (@calc[0] & 0xffff) # fast variant
+
       value = @calc[2]
 
       # console.log "digest", @digest(), @calc[0], @calc[1]
@@ -227,7 +233,7 @@ exports.Adler32 = Adler32
 
 
 createRandomData = (cb) ->
-  size = 1024 * 1024 * 10
+  size = 1024 * 1024 * 40
   chunk = null
   chunkPos = size / 2
   realChunkPos = null
