@@ -185,7 +185,6 @@ class Adler32 extends EventEmitter
       @calc[2] = ((@calc[1] << 16) | @calc[0])
       value = @calc[2]
 
-
       # console.log "digest", @digest(), @calc[0], @calc[1]
 
       # Test each byte of the integer individually for speed. It's slow as hell
@@ -201,7 +200,7 @@ class Adler32 extends EventEmitter
                   digest: @digest()
                   position: @pos - @windowSize
               else
-                console.log "table failed"
+                throw "table failed"
 
       # console.log "current", @toString(), @hexdigest(), @digest(), Object.keys(@needles)
       # if @needles[@calc[2]]
@@ -224,7 +223,7 @@ exports.Adler32 = Adler32
 
 
 createRandomData = (cb) ->
-  size = 1024 * 1024 * 10
+  size = 1024 * 1024 * 50
   chunk = null
   chunkPos = size / 2
   realChunkPos = null
