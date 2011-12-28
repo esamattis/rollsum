@@ -210,6 +210,10 @@ class Adler32 extends EventEmitter
       #     position: @pos - @windowSize
 
 
+    # DO not create an array as return value
+    undefined
+
+
 
   digest: -> @calc[2]
   hexdigest: -> @calc[2].toString 16
@@ -223,7 +227,7 @@ exports.Adler32 = Adler32
 
 
 createRandomData = (cb) ->
-  size = 1024 * 1024 * 50
+  size = 1024 * 1024 * 10
   chunk = null
   chunkPos = size / 2
   realChunkPos = null
@@ -234,7 +238,7 @@ createRandomData = (cb) ->
   outStream = fs.createWriteStream "/tmp/randblob"
   inStream.on "data", (data) ->
 
-    console.log "got", data.length, readBytes, "/", size
+    # console.log "got", data.length, readBytes, "/", size
 
     outStream.write data
 
