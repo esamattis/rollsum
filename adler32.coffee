@@ -8,6 +8,7 @@ OFFS=1          # default initial s1 offset
 
 ROLLSUM_CHAR_OFFSET = 31
 
+## Faster variant of Adler32
 # class Adler32 extends EventEmitter
 #
 #
@@ -82,30 +83,59 @@ ROLLSUM_CHAR_OFFSET = 31
 
 class Adler32 extends EventEmitter
 
-  constructor: (@windowSize, needles) ->
-    @count = 0
+  constructor: (@windowSize, @needleArray) ->
     @a = OFFS
     @b = 0
+    @count = 0
+
+    @pos = 0
+
+    @stage1 = new Buffer 256
+    for k, i in @stage1
+      @stage1[i] = 0
+
+    if @windowSize
+      @initWindow()
+    else
+      @update = Adler32::sumOnly
+
+  initWindow: ->
+    @buf = new Buffer @windowSize
 
     @needles = {}
 
-    if @windowSize
-      for n in needles
-        console.log "searching for", n, n.toString(16)
-        @needles[n.toString 10] = 1
+    @intTable = for i in [0..3]
+      b = new Buffer 256
+      for k, j in b
+        b[j] = 0
+      b
 
-      @buf = new Buffer @windowSize
-      @arr = []
-    else
-      @update = (data) ->
-        for byte in data
-          @a = @a + byte
-          @b = @b + @a
-          @a %= BASE
-          @b %= BASE
-        @_digest = (@b << 16) | @a
+    console.log @intTable.length
 
-    @pos = 0
+    for value in @needleArray
+      console.log "searching for", value, value.toString(16)
+
+      # Tear down the int
+      @intTable[0][(value >>> 24) & 0xff] = 1
+      @intTable[1][(value >>> 16) & 0xff] = 1
+      @intTable[2][(value >>> 8) & 0xff] = 1
+      @intTable[3][value & 0xff] = 1
+
+      @needles[value] = true
+
+    console.log @intTable
+    # For debugging
+    @arr = []
+
+  sumOnly: (data) ->
+    for byte in data
+      @a = @a + byte
+      @b = @b + @a
+      @a %= BASE
+      @b %= BASE
+    @_digest = (@b << 16) | @a
+
+
 
   update: (data) ->
     for byte in data
@@ -113,8 +143,6 @@ class Adler32 extends EventEmitter
         # Just rollin and fill the window
         @a = @a + byte
         @b = @b + @a
-        @a %= BASE
-        @b %= BASE
 
         @count += 1
         @buf[@pos] = byte
@@ -129,21 +157,28 @@ class Adler32 extends EventEmitter
 
         @a += byte - byteOut
         @b += @a - @count * byteOut - OFFS
-        @a %= BASE
-        @b %= BASE
 
         @buf[inPos] = byte
         # @arr.push byte
 
+      # @a %= BASE
+      # @b %= BASE
+
       @pos += 1
-      @_digest = ((@b << 16) | @a).toString 10
+      @_digest = value = ((@b << 16) | @a)
 
-      # console.log "now", @toString(), @hexdigest()
+      # Test each byte of the integer individually for speed. It slow as hell
+      # to test the needle directly
+      if @intTable[0][(value >>> 24) & 0xff] is 1
+        if @intTable[1][(value >>> 16) & 0xff] is 1
+          if @intTable[2][(value >>> 8) & 0xff] is 1
+            if @intTable[3][value & 0xff] is 1
+              # Should not be required, but just to make sure.
+              if @needles[@_digest]
+                @emit "found",
+                  digest: @_digest
+                  position: @pos - @windowSize
 
-      if @needles[@_digest]
-        @emit "found",
-          digest: @_digest
-          position: @pos - @windowSize
 
 
 
@@ -161,7 +196,7 @@ exports.Adler32 = Adler32
 
 if require.main is module
   fs = require "fs"
-  stream = fs.createReadStream "/home/epeli/media/Tron.avi"
+  stream = fs.createReadStream "blob.data"
 
   a = new Adler32 1024*2, [ 1245, 324324 ]
   # a = new Adler32
