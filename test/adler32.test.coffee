@@ -6,10 +6,10 @@ assert = require "assert"
 
 describe "Adler32 checksum", ->
 
-  it "can get sum for simple string", ->
-    a = new Adler32
-    a.update new Buffer "car"
-    assert.equal a.hexdigest(), "2600137"
+  # it "can get sum for simple string", ->
+  #   a = new Adler32
+  #   a.update new Buffer "car"
+  #   assert.equal a.hexdigest(), "2600137"
 
 
   it "can find car from big string", (done) ->

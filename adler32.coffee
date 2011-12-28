@@ -88,7 +88,8 @@ class Adler32 extends EventEmitter
 
   constructor: (@windowSize, @needleArray) ->
     @calc = new Uint32Array 3
-    @calc[0] = 1
+    @calc[0] = 0
+    # @calc[0] = 1
     @calc[1] = 0
 
 
@@ -124,7 +125,7 @@ class Adler32 extends EventEmitter
       @intTable[1][(value >>> 16) & 0xff] = 1
       @intTable[2][(value >>> 8) & 0xff] = 1
       @intTable[3][value & 0xff] = 1
-      # console.log "INT", (value >>> 24) & 0xff, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff
+      console.log "INT", (value >>> 24) & 0xff, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff
 
       @needles[value] = true
 
@@ -134,10 +135,12 @@ class Adler32 extends EventEmitter
 
   sumOnly: (data) ->
     for byte in data
-      @calc[0] = @calc[0] + byte
-      @calc[1] = @calc[1] + @calc[0]
-      @calc[0] %= BASE
-      @calc[1] %= BASE
+      @calc[0] += byte + ROLLSUM_CHAR_OFFSET
+      @calc[1] += @calc[0]
+      # @calc[0] = @calc[0] + byte
+      # @calc[1] = @calc[1] + @calc[0]
+      # @calc[0] %= BASE
+      # @calc[1] %= BASE
 
     @calc[2] = (@calc[1] << 16) | @calc[0]
 
@@ -147,12 +150,14 @@ class Adler32 extends EventEmitter
     for byte in data
       if @pos < @windowSize
         # Just rollin and fill the window
-        @calc[0] = @calc[0] + byte
-        @calc[1] = @calc[1] + @calc[0]
+        @calc[0] += byte + ROLLSUM_CHAR_OFFSET
+        @calc[1] += @calc[0]
+        # @calc[0] = @calc[0] + byte
+        # @calc[1] = @calc[1] + @calc[0]
 
         @count += 1
         @buf[@pos] = byte
-        @arr.push byte
+        # @arr.push byte
       else
         # Start rotating
 
@@ -160,45 +165,50 @@ class Adler32 extends EventEmitter
         outPos = (@pos + @windowSize) % @windowSize
         byteOut = @buf[outPos]
         # assert.equal byteOut, @arr.shift()
-        byteOut = @arr.shift()
+        # byteOut = @arr.shift()
 
+        # @calc[0] += byte - byteOut
+        # @calc[1] += @calc[0] - @count * byteOut - OFFS
         @calc[0] += byte - byteOut
-        @calc[1] += @calc[0] - @count * byteOut - OFFS
+        @calc[1] += @calc[0] - @count * (byteOut + ROLLSUM_CHAR_OFFSET)
+
 
         @buf[inPos] = byte
-        @arr.push byte
+        # @arr.push byte
 
-      @calc[0] %= BASE
-      @calc[1] %= BASE
+
+      # @calc[0] %= BASE
+      # @calc[1] %= BASE
 
       @pos += 1
 
       @calc[2] = ((@calc[1] << 16) | @calc[0])
-
       value = @calc[2]
 
-      # console.log "digest", @_digest, @calc[0], @calc[1]
+
+      # console.log "digest", @digest(), @calc[0], @calc[1]
 
       # Test each byte of the integer individually for speed. It's slow as hell
       # to test the needle directly
-      # if @intTable[0][(value >>> 24) & 0xff] is 1
-      #   if @intTable[1][(value >>> 16) & 0xff] is 1
-      #     if @intTable[2][(value >>> 8) & 0xff] is 1
-      #       if @intTable[3][value & 0xff] is 1
-      #         console.log "stage 4 ok"
-      #         # Should not be required, but just to make sure.
-      #         if @needles[@_digest]
-      #           @emit "found",
-      #             digest: @_digest
-      #             position: @pos - @windowSize
-      #         else
-      #           console.log "table failed"
+      if @intTable[0][(value >>> 24) & 0xff] is 1
+        if @intTable[1][(value >>> 16) & 0xff] is 1
+          if @intTable[2][(value >>> 8) & 0xff] is 1
+            if @intTable[3][value & 0xff] is 1
+              console.log "stage 4 ok"
+              # Should not be required, but just to make sure.
+              if @needles[@calc[2]]
+                @emit "found",
+                  digest: @digest()
+                  position: @pos - @windowSize
+              else
+                console.log "table failed"
 
-      console.log "current", @toString(), @hexdigest(), @digest()
-      if @needles[@calc[2]]
-        @emit "found",
-          digest: @_digest
-          position: @pos - @windowSize
+      # console.log "current", @toString(), @hexdigest(), @digest(), Object.keys(@needles)
+      # if @needles[@calc[2]]
+      #   console.log "found!!"
+      #   @emit "found",
+      #     digest: @digest()
+      #     position: @pos - @windowSize
 
 
 
@@ -259,7 +269,7 @@ if require.main is module
     searchAdler = new Adler32 chunk.length, [ a.digest() ]
 
     searchAdler.on "found", (e) ->
-      console.log "FOUND", searchAdler.buf
+      # console.log "FOUND", searchAdler.buf
       console.log "Found", e.digest, "from", e.position, "should", doc.position
 
 
@@ -277,14 +287,14 @@ if require.main is module
 
     stream = fs.createReadStream "/tmp/randblob"
     stream.on "data", (data) ->
-      blobsum.update data
+      # blobsum.update data
       searchAdler.update data
       size += data.length
 
     stream.on "end", ->
       clearInterval i
       update()
-      console.log "done blob sum:", blobsum.hexdigest(), blobsum.digest()
+      console.log "done blob hex:", blobsum.hexdigest(), "digest", blobsum.digest()
 
 
 
