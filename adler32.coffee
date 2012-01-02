@@ -1,5 +1,6 @@
 {EventEmitter} = require "events"
 fs = require "fs"
+crypto = require "crypto"
 
 _  = require 'underscore'
 
@@ -106,6 +107,29 @@ class Adler32 extends EventEmitter
       @initWindow()
     else
       @update = Adler32::sumOnly
+
+  windowHash: ->
+    hash = crypto.createHash "sha512"
+
+    inPos = @pos % @windowSize
+    outPos = (@pos + @windowSize) % @windowSize
+
+    starBuf = @buf.slice inPos, @windowSize
+    endBuf = @buf.slice 0, outPos
+
+    console.log "TEST"
+    console.log "in: #{ inPos }, out: #{ outPos }"
+    console.log new Buffer("car"), "required"
+    console.log @buf
+    console.log starBuf, endBuf
+    console.log "end TEST"
+
+
+
+    hash.update starBuf
+    hash.update endBuf
+
+    hash
 
   initWindow: ->
     @buf = new Buffer @windowSize

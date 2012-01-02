@@ -1,38 +1,50 @@
 
 assert = require "assert"
+crypto = require "crypto"
+
+_  = require 'underscore'
+
 {Adler32} = require "../adler32"
 
 
 
-describe "Adler32 checksum", ->
+describe "Checksum searcher", ->
+  chunk = new Buffer "car"
+  dataString = new Buffer "lol my car is on fire"
+
+  car = new Adler32
+  car.update chunk
+  carDigest = car.digest()
+
+  searchSum = null
+  result = null
+
+  beforeEach (done) ->
+    searchSum = new Adler32 chunk.length, [ carDigest ]
+    searchSum.on "found", (e) ->
+      console.log e, searchSum.buf, new Buffer "car"
+      result = e
+      done()
+
+    searchSum.update dataString
+
+  afterEach ->
+    console.log "after", searchSum.buf
+
+  it "can find car from big string",  ->
+    assert.equal result.position, 7
+
+
+  it "can calculate strong sum of the window", ->
+    hash = crypto.createHash "sha512"
+    hash.update new Buffer "car"
+    assert.equal hash.digest("hex"), searchSum.windowHash().digest("hex")
+
 
   # it "can get sum for simple string", ->
   #   a = new Adler32
   #   a.update new Buffer "car"
   #   assert.equal a.hexdigest(), "2600137"
-
-
-  it "can find car from big string", (done) ->
-
-    chunk = new Buffer "car"
-    car = new Adler32
-    car.update chunk
-    carDigest = car.digest()
-    console.log "car is ", car.hexdigest()
-
-    a =  new Adler32 chunk.length, [ carDigest ]
-
-    a.on "found", (e) ->
-      assert.equal e.position, 7
-      done()
-
-    dataString = new Buffer "lol my car is on fire"
-
-    a.update dataString
-
-
-
-
 
     # big = new Adler32 chunk.length
 
